@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/scripts/V_1_0__create_tables.sql
+
+  - include:
+      file: liquibase/scripts/V_1_1__create_fk.sql
+
+  - include:
+      file: liquibase/scripts/V_1_2_add_columns.sql
+
+  - include:
+      file: liquibase/scripts/V_1_3_add_constraints.sql
