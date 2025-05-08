@@ -9,7 +9,7 @@ import net.tgoroshek.subscriptionsdemo.model.authorization.GenericUser;
 import net.tgoroshek.subscriptionsdemo.payload.UserDto;
 import net.tgoroshek.subscriptionsdemo.repo.UserRepo;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,18 +55,23 @@ public class UserService {
         userDetailsManager.changePassword(oldPass, passwordEncoder.encode(newPass));
     }
 
+    @PreAuthorize("#username == authentication.name or hasAuthority('DELETE_USERS')")
     public void deleteUser(String username) {
-        userRepo.deleteByUsername(username);
+        userDetailsManager.deleteUser(username);
     }
 
-    public GenericUser updateUser(UserDto userDto) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    @PreAuthorize("{#username == authentication.name}")
+    public GenericUser updateUser(UserDto userDto, String username) {
+
         GenericUser user = userRepo.findByUsername(username).orElseThrow(() -> new NoSuchElementException(username + " не найден."));
+
+        //Проверка на то, что это мы пытаемся отредактировать своего пользователя переехала в "@PreAuthorize"
         if (user.getUsername() != null) {
             if (!username.equals(userDto.getUsername())) {
                 updateUsername(user, username);
             }
         }
+
         user.setAge(userDto.getAge());
         user.setGender(GenericUser.Gender.valueOf(userDto.getGender()));
         user.setEmail(userDto.getEmail());

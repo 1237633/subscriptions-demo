@@ -14,41 +14,42 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
 
-    @PostMapping()
+    @PostMapping(Router.Users.REGISTER)
     @JsonView(ResponseSegregation.ShortDetails.class)
     public ResponseEntity<UserRegistrationDto> register(@Validated(RequestTypes.New.class) @RequestBody UserRegistrationDto user) {
         return ResponseEntity.ok(userMapper.toRegistrationDto(
                 userService.register(user.getUsername(), user.getPassword())));
     }
 
-    @GetMapping("/{username}")
+    @GetMapping(Router.Users.BY_USERNAME)
     public ResponseEntity<UserDto> getUser(@PathVariable String username) {
         return ResponseEntity.ok(userMapper.toUserDto(
                 userService.getUser(username)));
     }
 
-    @PutMapping("/password")
+    @PutMapping(Router.Users.PASSWORD)
     public ResponseEntity<?> updatePassword(@Validated(RequestTypes.Update.class) @RequestBody UserRegistrationDto userDto) {
         userService.updatePassword(userDto.getOldPassword(), userDto.getPassword());
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping()
-    public ResponseEntity<?> deleteUSer(@Validated(RequestTypes.Existing.class) @RequestBody UserRegistrationDto userDto) {
-        userService.deleteUser(userDto.getUsername());
+    @DeleteMapping(Router.Users.BY_USERNAME)
+    public ResponseEntity<?> deleteUSer(@PathVariable String username) {
+        userService.deleteUser(username);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping()
-    public ResponseEntity<UserDto> updateUser(@Validated(RequestTypes.Update.class) @RequestBody UserDto userDto) {
+    @PutMapping(Router.Users.BY_USERNAME)
+    public ResponseEntity<UserDto> updateUser(
+            @Validated(RequestTypes.Update.class) @RequestBody UserDto userDto,
+            @PathVariable String username) {
         return ResponseEntity.ok(userMapper.toUserDto(
-                userService.updateUser(userDto)));
+                userService.updateUser(userDto, username)));
     }
 
 }

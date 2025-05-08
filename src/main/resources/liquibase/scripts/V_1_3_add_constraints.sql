@@ -6,3 +6,10 @@ ALTER TABLE users
 
 ALTER table authorities
     ADD CONSTRAINT authorities_check CHECK ( authority IN ( 'READ', 'WRITE', 'EDIT', 'DELETE', 'EDIT_AUTHORITIES', 'DISABLE_USERS', 'DELETE_USERS'));
+
+-- changeset tgoro:2
+ALTER table authorities
+    DROP CONSTRAINT authorities_check;
+
+ALTER table authorities
+    ADD CONSTRAINT authorities_check CHECK ( authority IN ( 'READ', 'WRITE', 'EDIT', 'DELETE', 'EDIT_AUTHORITIES', 'DISABLE_USERS', 'DELETE_USERS', 'MODERATE'));

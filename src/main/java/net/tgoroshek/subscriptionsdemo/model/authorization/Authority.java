@@ -96,7 +96,7 @@ public class Authority {
     }
 
     public enum AuthoritiesConstants {
-        READ, WRITE, EDIT, DELETE, EDIT_AUTHORITIES, DISABLE_USERS, DELETE_USERS
+        READ, WRITE, EDIT, DELETE, EDIT_AUTHORITIES, DISABLE_USERS, DELETE_USERS, MODERATE
     }
 }
 

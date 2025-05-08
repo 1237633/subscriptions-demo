@@ -6,12 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.tgoroshek.subscriptionsdemo.model.Subscription;
-
 @Entity()
-@DiscriminatorValue("VK_MUSIC")
+@DiscriminatorValue("AMAZON")
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class VkMusic extends Subscription {
+public class Amazon extends Subscription {
 
+    private Type type;
+    public enum Type{
+        PRIME, REGULAR
+    }
 }
