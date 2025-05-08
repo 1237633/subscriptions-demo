@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 
@@ -30,7 +29,7 @@ public class UserService {
     private final UserRepo userRepo;
 
     @Transactional
-    public GenericUser register(String username, String password) throws IOException {
+    public GenericUser register(String username, String password) {
 
         UserDetails newUser = User
                 .withUsername(username)
@@ -41,7 +40,7 @@ public class UserService {
         try {
             userDetailsManager.createUser(newUser);
         } catch (DuplicateKeyException e) {
-            log.error(e.getMessage(), e);
+            log.error(e.getMessage());
             throw new UserAlreadyExistsException(e);
         }
 

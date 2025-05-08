@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -24,15 +22,15 @@ public class UserController {
 
     @PostMapping()
     @JsonView(ResponseSegregation.ShortDetails.class)
-    public ResponseEntity<UserRegistrationDto> register(@Validated(RequestTypes.New.class) @RequestBody UserRegistrationDto user) throws IOException {
+    public ResponseEntity<UserRegistrationDto> register(@Validated(RequestTypes.New.class) @RequestBody UserRegistrationDto user) {
         return ResponseEntity.ok(userMapper.toRegistrationDto(
                 userService.register(user.getUsername(), user.getPassword())));
     }
 
-    @GetMapping()
-    public ResponseEntity<UserDto> getUser(@Validated(RequestTypes.Existing.class) @RequestBody UserRegistrationDto user) {
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDto> getUser(@PathVariable String username) {
         return ResponseEntity.ok(userMapper.toUserDto(
-                userService.getUser(user.getUsername())));
+                userService.getUser(username)));
     }
 
     @PutMapping("/password")
