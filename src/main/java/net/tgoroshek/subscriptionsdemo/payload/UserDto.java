@@ -14,16 +14,16 @@ import java.util.Set;
 @Getter
 @Setter
 public class UserDto {
-
+    @Null(groups = {RequestTypes.Default.class}, message = "Username - это навсегда!")
     private String username;
 
     @Null(groups = {RequestTypes.Default.class}, message = "Поле не поддерживает редактирование")
-    private boolean enabled;
+    private Boolean enabled;
 
     @Null(groups = {RequestTypes.Default.class}, message = "Поле не поддерживает редактирование")
     private Set<String> authorities;
 
-    private String age;
+    private Short age;
 
     private String gender;
 

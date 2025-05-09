@@ -1,7 +1,9 @@
 package net.tgoroshek.subscriptionsdemo.service;
 
 import net.tgoroshek.subscriptionsdemo.config.TestConfig;
+import net.tgoroshek.subscriptionsdemo.exception.InvalidDataException;
 import net.tgoroshek.subscriptionsdemo.model.authorization.GenericUser;
+import net.tgoroshek.subscriptionsdemo.payload.UserDto;
 import net.tgoroshek.subscriptionsdemo.payload.UserRegistrationDto;
 import net.tgoroshek.subscriptionsdemo.repo.UserRepo;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +23,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.io.IOException;
 import java.util.Optional;
 
 
@@ -44,7 +45,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    void register() throws IOException {
+    void register(){
         UserRegistrationDto dto = new UserRegistrationDto();
 
         dto.setUsername("username1");
@@ -56,7 +57,7 @@ class UserServiceTest {
     }
 
     @Test
-    void registerExistingUser() throws IOException {
+    void registerExistingUser() {
         UserRegistrationDto dto = new UserRegistrationDto();
 
         dto.setUsername("username2");
@@ -70,7 +71,7 @@ class UserServiceTest {
 
     @Test
     @WithMockUser(username = "username3")
-    void updatePassword() throws IOException {
+    void updatePassword(){
 
         UserRegistrationDto userDto = new UserRegistrationDto();
         userDto.setUsername("username3");
@@ -89,7 +90,7 @@ class UserServiceTest {
 
     @Test
     @WithMockUser("username4")
-    void deleteUser() throws IOException {
+    void deleteUser() {
 
         String USERNAME = "username4";
 
@@ -104,7 +105,7 @@ class UserServiceTest {
 
     @Test
     @WithAnonymousUser
-    void deleteUserUnauthorized() throws IOException {
+    void deleteUserUnauthorized() {
 
         String USERNAME = "username5";
 
@@ -118,6 +119,49 @@ class UserServiceTest {
         Assertions.assertTrue(userDetailsManager.userExists(USERNAME));
     }
 
-    //todo UpdUserTest
+    @Test
+    @WithMockUser("username5")
+    void updUser() {
+
+        UserDto dto = new UserDto();
+        dto.setAge((short) 21);
+        dto.setEmail("a@b.c");
+        dto.setGender("MALE");
+
+        String USERNAME = "username5";
+
+        GenericUser user = new GenericUser();
+        user.setUsername(USERNAME);
+
+        Mockito.when(userRepo.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        Mockito.when(userRepo.save(Mockito.any())).thenReturn(user);
+        GenericUser updUser = userService.updateUser(dto, USERNAME);
+
+        Assertions.assertEquals(updUser.getAge(), dto.getAge());
+        Assertions.assertEquals(updUser.getGender().toString(), dto.getGender().toString());
+        Assertions.assertEquals(updUser.getEmail(), dto.getEmail());
+    }
+
+    @Test
+    @WithMockUser("username6")
+    void updUserWithWrongData() {
+
+        UserDto dto = new UserDto();
+        dto.setAge((short) 21);
+        dto.setEmail("a@b.c");
+        dto.setGender("Helicopter");
+
+        String USERNAME = "username6";
+        Mockito.when(userRepo.findByUsername(USERNAME)).thenReturn(Optional.of(new GenericUser()));
+        Assertions.assertThrows(InvalidDataException.class, () -> userService.updateUser(dto, USERNAME));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void updUserUnauthorized() {
+        UserDto dto = new UserDto();
+        Assertions.assertThrows(AuthorizationDeniedException.class, () -> userService.updateUser(dto, "USERNAME"));
+    }
+
 
 }

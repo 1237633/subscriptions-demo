@@ -23,7 +23,7 @@ public class GenericUser {
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Set<Authority> authorities;
 
-    private String age;
+    private Short age;
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private String email;

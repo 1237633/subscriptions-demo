@@ -3,6 +3,7 @@ package net.tgoroshek.subscriptionsdemo.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.tgoroshek.subscriptionsdemo.exception.InvalidDataException;
 import net.tgoroshek.subscriptionsdemo.exception.UserAlreadyExistsException;
 import net.tgoroshek.subscriptionsdemo.model.authorization.Authority;
 import net.tgoroshek.subscriptionsdemo.model.authorization.GenericUser;
@@ -60,33 +61,22 @@ public class UserService {
         userDetailsManager.deleteUser(username);
     }
 
-    @PreAuthorize("{#username == authentication.name}")
+    @PreAuthorize("#username == authentication.name")
+    @Transactional
     public GenericUser updateUser(UserDto userDto, String username) {
 
         GenericUser user = userRepo.findByUsername(username).orElseThrow(() -> new NoSuchElementException(username + " не найден."));
 
-        //Проверка на то, что это мы пытаемся отредактировать своего пользователя переехала в "@PreAuthorize"
-        if (user.getUsername() != null) {
-            if (!username.equals(userDto.getUsername())) {
-                updateUsername(user, username);
-            }
-        }
-
         user.setAge(userDto.getAge());
-        user.setGender(GenericUser.Gender.valueOf(userDto.getGender()));
+        try {
+            user.setGender(GenericUser.Gender.valueOf(userDto.getGender()));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataException("Неверно указан пол");
+        }
         user.setEmail(userDto.getEmail());
 
-        return user;
-    }
+        return userRepo.save(user);
 
-    private void updateUsername(GenericUser user, String username) {
-        if (userRepo.existsByUsername(username)) {
-            throw new UserAlreadyExistsException();
-        }
-
-        user.setUsername(username);
-/*        user.getAuthorities()
-                .forEach(authority -> authority.setUser(user));*/
     }
 
 }
