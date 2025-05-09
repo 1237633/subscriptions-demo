@@ -127,7 +127,7 @@ class SubscriptionServiceTest {
         SecureRandom random = new SecureRandom();
         List<Subscription> subscriptions = new ArrayList<>();
         ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
-        //Складываем все в лист, вместо БД
+        //РЎРєР»Р°РґС‹РІР°РµРј РІСЃРµ РІ Р»РёСЃС‚, РІРјРµСЃС‚Рѕ Р‘Р”
         Mockito.when(subscriptionRepo.save(captor.capture())).thenAnswer((Answer<Void>) invocation -> {
             subscriptions.add(captor.getValue());
             return null;
@@ -158,7 +158,7 @@ class SubscriptionServiceTest {
 
         // Mockito.when(subscriptionRepo.getAllByOwnerUsername(Mockito.anyString())).;
 
-        subscriptionService.getUsersSubscriptions(USERNAME); //Результат будет пуст, поскольку репозиторий - мок и в БД ничего не пишем
+        subscriptionService.getUsersSubscriptions(USERNAME); //Р РµР·СѓР»СЊС‚Р°С‚ Р±СѓРґРµС‚ РїСѓСЃС‚, РїРѕСЃРєРѕР»СЊРєСѓ СЂРµРїРѕР·РёС‚РѕСЂРёР№ - РјРѕРє Рё РІ Р‘Р” РЅРёС‡РµРіРѕ РЅРµ РїРёС€РµРј
         Mockito.verify(subscriptionRepo, Mockito.atLeastOnce()).getAllByOwnerUsername(USERNAME);
 
         boolean ownerMatch = true;
